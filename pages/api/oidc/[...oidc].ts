@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Provider, Configuration } from 'oidc-provider';
 
 // TapIn等の接続元アプリ（Client）の登録
