@@ -57,7 +57,7 @@ const configuration: Configuration = {
 };
 
 // 発行元URL（ローカル環境用）
-const ISSUER_URL = 'http://localhost:3000/api/oidc';
+const ISSUER_URL = 'https://fekeduatixasksmycobq.supabase.co/auth/v1/callback';
 let oidc: Provider;
 
 export default function handler(req: any, res: any) {
