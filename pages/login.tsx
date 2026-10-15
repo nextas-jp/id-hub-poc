@@ -13,17 +13,26 @@ export default function Login() {
     if (!router.isReady) return;
 
     const checkSession = async () => {
+      console.log("① Hubログイン画面が開かれました");
+      console.log("② 現在のURLパラメータ:", router.query);
+
       const { data: { session } } = await supabase.auth.getSession();
       
-      // セッション（鍵）をすでに持っているなら、フォームを見せずに即座に次へ送る
       if (session) {
+        console.log("③ 【成功】ログイン済みのセッションを発見しました！", session.user.email);
+        
+        // 戻り先URLを取得（なければ '/' になる）
         const next = typeof router.query.next === 'string' ? router.query.next : '/';
+        console.log("④ 次の移動先:", next);
+
         router.push(next.startsWith('/') && !next.startsWith('//') ? next : '/');
+      } else {
+        console.log("③ 【失敗】セッションが見つかりません。フォームで待機します。");
       }
     };
 
     checkSession();
-  }, [router.isReady, router.query.next]);
+  }, [router.isReady, router.query]);
   // ▲▲▲ ここまで追加 ▲▲▲
 
   // TODO: FormEvent deprecated....
