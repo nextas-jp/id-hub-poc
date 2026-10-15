@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabase';
 
@@ -7,6 +7,24 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // ▼▼▼ ここから追加：すでにログイン済みの場合は自動スキップする処理 ▼▼▼
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // セッション（鍵）をすでに持っているなら、フォームを見せずに即座に次へ送る
+      if (session) {
+        const next = typeof router.query.next === 'string' ? router.query.next : '/';
+        router.push(next.startsWith('/') && !next.startsWith('//') ? next : '/');
+      }
+    };
+
+    checkSession();
+  }, [router.isReady, router.query.next]);
+  // ▲▲▲ ここまで追加 ▲▲▲
 
   // TODO: FormEvent deprecated....
   async function onSubmit(e: React.FormEvent) {
