@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 
 export default function Logout() {
   const router = useRouter();
-  const [message, setMessage] = useState('Logging out...');
+  const [message, setMessage] = useState('Hubのログアウト処理中...');
   const started = useRef(false);
 
   useEffect(() => {
@@ -13,31 +13,41 @@ export default function Logout() {
 
     const performLogout = async () => {
       try {
-        // 1. 【追加】Supabaseがローカルストレージから現在のセッションを認識するのを待つ
-        await supabase.auth.getSession();
+        // 1. まず現在のセッション状態を確認
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('ログアウト前のHubセッション:', session);
 
-        // 2. Hub側のセッションを破棄（サーバー側へのトークン無効化リクエスト）
+        // 2. Hub側のセッションを破棄（サーバーへログアウト要求）
         const { error } = await supabase.auth.signOut();
-        if (error) console.error('Hub logout error:', error);
-
-        // 3. 【追加のフェイルセーフ】
-        // ブラウザの仕様によるタイミング問題でデータが残るのを完全に防ぐため、
-        // 関連するSupabaseの認証キー（sb-...-auth-token）を強制的に消去する
-        Object.keys(window.localStorage).forEach((key) => {
-          if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
-            window.localStorage.removeItem(key);
-          }
-        });
-      } catch (err) {
-        console.error('Unexpected error during logout:', err);
-      } finally {
-        // 4. ログアウト処理が完了（または失敗）しても、必ずTapInへ送り返す
-        const returnTo = router.query.return_to as string;
-        if (returnTo) {
-          window.location.href = returnTo;
-        } else {
-          router.replace('/login');
+        
+        // ★ エラーが起きた場合は、画面に表示して「ここで止める」（リダイレクトしない）
+        if (error) {
+          console.error('Hub logout error:', error);
+          setMessage(`エラー発生: ${error.message} (コンソールを確認してください)`);
+          return; 
         }
+
+        // 3. Supabaseの非同期処理（内部でのストレージ削除）が完了するのを少し待つ
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 4. 【ダメ押し】ブラウザから強制的に指定のキーを削除する
+        window.localStorage.removeItem('sb-ulhqafbstiqyhbodvpny-auth-token');
+
+        // 5. 成功のメッセージを出して、3秒待ってからリダイレクトする
+        setMessage('Hubのログアウト成功！3秒後にTapInへ戻ります...');
+        
+        setTimeout(() => {
+          const returnTo = router.query.return_to as string;
+          if (returnTo) {
+            window.location.href = returnTo;
+          } else {
+            router.replace('/login');
+          }
+        }, 3000);
+
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        setMessage('予期せぬエラーが発生しました。');
       }
     };
 
@@ -46,7 +56,7 @@ export default function Logout() {
 
   return (
     <main style={{ maxWidth: 360, margin: '80px auto', fontFamily: 'sans-serif', textAlign: 'center' }}>
-      <h2>{message}</h2>
+      <h2 style={{ lineHeight: '1.5' }}>{message}</h2>
     </main>
   );
 }
