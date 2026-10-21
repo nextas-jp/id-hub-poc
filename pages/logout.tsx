@@ -32,14 +32,8 @@ export default function Logout() {
       if (returnTo) {
         window.location.href = returnTo;
       } else {
-        // ▼▼▼ 変更箇所：Hub単体でログアウトされた場合は、TapInへ道連れリダイレクトする ▼▼▼
-        
-        // ※TapInの本番URLを指定してください
-        const tapinUrl = process.env.NEXT_PUBLIC_TAPIN_URL || 'https://n-tapin-vercel-tau.vercel.app';
-        const hubLoginUrl = window.location.origin + '/login';
-
-        // TapInのログアウト画面へ飛ばし、「終わったらHubのログイン画面に戻して」と指示を出す
-        window.location.href = `${tapinUrl}/logout?return_to=${encodeURIComponent(hubLoginUrl)}`;
+        const hubUrl = process.env.NEXT_PUBLIC_HUB_URL || 'https://id-hub-poc.vercel.app';
+        window.location.href = `${hubUrl}/logout?return_to=${encodeURIComponent(window.location.origin)}`;
         
         // ▲▲▲ ここまで変更 ▲▲▲
       }
