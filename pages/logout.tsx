@@ -32,10 +32,14 @@ export default function Logout() {
       if (returnTo) {
         window.location.href = returnTo;
       } else {
-        const hubUrl = process.env.NEXT_PUBLIC_HUB_URL || 'https://id-hub-poc.vercel.app';
-        window.location.href = `${hubUrl}/logout?return_to=${encodeURIComponent(window.location.origin)}`;
+        // ※実際のTapInの本番URL
+        const tapinUrl = process.env.NEXT_PUBLIC_TAPIN_URL || 'https://n-tapin-vercel-tau.vercel.app';
         
-        // ▲▲▲ ここまで変更 ▲▲▲
+        // お掃除が終わった後に戻ってきてほしいHubのログイン画面のURL
+        const hubLoginUrl = window.location.origin + '/login';
+
+        // TapInの「設定画面（/settings）」の裏口へ送り込む
+        window.location.href = `${tapinUrl}/settings?action=logout&return_to=${encodeURIComponent(hubLoginUrl)}`;
       }
     };
 
