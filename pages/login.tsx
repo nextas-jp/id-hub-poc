@@ -13,7 +13,7 @@ export default function Login() {
     if (!router.isReady) return;
 
     const checkSession = async () => {
-      console.log(process.version);
+      console.log(process.versions.node);
 
 
       const { data: { session } } = await supabase.auth.getSession();
