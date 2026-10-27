@@ -46,17 +46,19 @@ export default function MyPage() {
 
   // PDFを安全に開くための署名付きURL（一時URL）を発行する処理
   const handleViewPdf = async (filePath: string) => {
+    console.log('取得を試みるファイルパス:', filePath); // ★追加：データベースに登録されたパスを確認
+
     const { data, error } = await supabase
       .storage
       .from('payslips')
-      .createSignedUrl(filePath, 60); // 60秒間だけ有効なURLを発行
+      .createSignedUrl(filePath, 60);
 
     if (error) {
-      alert('ファイルの取得に失敗しました。アクセス権限がありません。');
+      console.error('Storageエラー詳細:', error); // ★追加：Supabaseから返ってくる本当のエラー原因を確認
+      alert(`エラー: ${error.message}\nコンソールを確認してください。`);
       return;
     }
 
-    // 発行された一時URLを別タブで開く
     if (data?.signedUrl) {
       window.open(data.signedUrl, '_blank');
     }
