@@ -8,20 +8,23 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  // ▼▼▼ ここから追加：すでにログイン済みの場合は自動スキップする処理 ▼▼▼
   useEffect(() => {
     if (!router.isReady) return;
 
+    // ▼▼▼ 追加：ミドルウェアから弾かれた場合のエラーメッセージ処理 ▼▼▼
+    if (router.query.error === 'banned_or_unauthorized') {
+      setError('このアカウントは凍結されているか、アクセス権がありません。');
+      // 残存キャッシュを確実に消去
+      supabase.auth.signOut();
+    }
+    // ▲▲▲ ここまで追加 ▲▲▲
+
     const checkSession = async () => {
-
-
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        
         // 戻り先URLを取得（なければ '/' になる）
         const next = typeof router.query.next === 'string' ? router.query.next : '/';
-
         router.push(next.startsWith('/') && !next.startsWith('//') ? next : '/');
       } else {
         console.log("③ 【失敗】セッションが見つかりません。フォームで待機します。");
@@ -30,18 +33,28 @@ export default function Login() {
 
     checkSession();
   }, [router.isReady, router.query]);
-  // ▲▲▲ ここまで追加 ▲▲▲
 
   // TODO: FormEvent deprecated....
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(error.message);
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    
+    // ▼▼▼ 修正：Supabaseのエラーメッセージを日本語に翻訳・カスタマイズ ▼▼▼
+    if (authError) {
+      let displayMessage = authError.message;
+
+      if (authError.message === 'User is banned') {
+        displayMessage = 'このアカウントは利用規約違反等のため凍結されています。管理者にお問い合わせください。';
+      } else if (authError.message === 'Invalid login credentials') {
+        displayMessage = 'メールアドレスまたはパスワードが間違っています。';
+      }
+
+      setError(displayMessage);
       return;
     }
+    // ▲▲▲ 修正ここまで ▲▲▲
 
     // MEMO: Go back to where we came from (the consent page), only inside this site
     const next = typeof router.query.next === 'string' ? router.query.next : '/';
@@ -67,7 +80,7 @@ export default function Login() {
           required
         />
         <button type="submit">Log in</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
       </form>
     </main>
   );
