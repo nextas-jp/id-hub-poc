@@ -30,12 +30,11 @@ export async function middleware(request) {
       },
     }
   );
-  
+
   const { data: { user }, error } = await supabase.auth.getUser();
 
-  // 保護したいルートの判定（例: /dashboard, /settings などログイン必須のパス）
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || 
-                           request.nextUrl.pathname.startsWith('/settings');
+  const isProtectedRoute = request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/dashboard') ||
+    request.nextUrl.pathname.startsWith('/settings');
 
   // ユーザーが存在しない、エラー（BAN含む）が発生した、かつ保護ルートにアクセスしようとした場合
   if (!user && isProtectedRoute) {
