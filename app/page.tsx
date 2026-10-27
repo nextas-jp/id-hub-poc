@@ -103,7 +103,8 @@ export default function MyPage() {
                   padding: '8px 16px',
                   borderRadius: '4px',
                   cursor: 'pointer',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  marginTop: "16px"
                 }}
               >
                 PDFを閲覧
