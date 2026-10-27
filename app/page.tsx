@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase'; 
+import { supabase } from '../lib/supabase';
 
 type Payslip = {
   id: string;
@@ -16,14 +16,26 @@ export default function MyPage() {
 
   useEffect(() => {
     async function fetchPayslips() {
+      // ① フロントエンドが「誰がログインしているか」を認識できているか確認
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log('現在のセッション:', sessionData.session);
+
+      if (sessionData.session) {
+        console.log('ログイン中のUID:', sessionData.session.user.id);
+      } else {
+        console.log('⚠️ セッションがありません（未ログイン扱いになっています）');
+      }
+
+      // ② データの取得結果とエラーの詳細を確認
       const { data, error } = await supabase
         .from('payslips')
         .select('*')
         .order('target_month', { ascending: false });
 
-      if (error) {
-        console.error('明細の取得エラー:', error);
-      } else if (data) {
+      console.log('取得したデータ:', data);
+      if (error) console.error('エラー詳細:', error);
+
+      if (data) {
         setPayslips(data);
       }
       setLoading(false);
@@ -57,20 +69,20 @@ export default function MyPage() {
   return (
     <main style={{ maxWidth: '600px', margin: '40px auto', fontFamily: 'sans-serif', padding: '0 20px' }}>
       <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px' }}>過去の給与明細</h1>
-      
+
       {payslips.length === 0 ? (
         <p style={{ color: '#666' }}>給与明細データがありません。</p>
       ) : (
         <div style={{ display: 'grid', gap: '16px' }}>
           {payslips.map((slip) => (
-            <div 
-              key={slip.id} 
-              style={{ 
-                border: '1px solid #ddd', 
-                padding: '16px', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                justifyContent: 'space-between', 
+            <div
+              key={slip.id}
+              style={{
+                border: '1px solid #ddd',
+                padding: '16px',
+                borderRadius: '8px',
+                display: 'flex',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
               }}
