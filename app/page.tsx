@@ -46,7 +46,7 @@ export default function MyPage() {
 
   // PDFを安全に開くための署名付きURL（一時URL）を発行する処理
   const handleViewPdf = async (filePath: string) => {
-    console.log('取得を試みるファイルパス:', filePath); // ★追加：データベースに登録されたパスを確認
+    console.log('取得を試みるファイルパス:', filePath);
 
     const { data, error } = await supabase
       .storage
@@ -54,7 +54,7 @@ export default function MyPage() {
       .createSignedUrl(filePath, 60);
 
     if (error) {
-      console.error('Storageエラー詳細:', error); // ★追加：Supabaseから返ってくる本当のエラー原因を確認
+      console.error('Storageエラー詳細:', error);
       alert(`エラー: ${error.message}\nコンソールを確認してください。`);
       return;
     }
@@ -83,9 +83,6 @@ export default function MyPage() {
                 border: '1px solid #ddd',
                 padding: '16px',
                 borderRadius: '8px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
               }}
             >
