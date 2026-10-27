@@ -69,43 +69,29 @@ export default function MyPage() {
   }
 
   return (
-    <main style={{ maxWidth: '600px', margin: '40px auto', fontFamily: 'sans-serif', padding: '0 20px' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px' }}>過去の給与明細</h1>
+    <main className="max-w-[600px] my-10 mx-auto font-sans px-5">
+      <h1 className="text-2xl font-bold mb-6">過去の給与明細</h1>
 
       {payslips.length === 0 ? (
-        <p style={{ color: '#666' }}>給与明細データがありません。</p>
+        <p className="text-gray-500">給与明細データがありません。</p>
       ) : (
-        <div style={{ display: 'grid', gap: '16px' }}>
+        <div className="grid gap-4">
           {payslips.map((slip) => (
             <div
               key={slip.id}
-              style={{
-                border: '1px solid #ddd',
-                padding: '16px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-              }}
+              className="border border-gray-300 p-4 rounded-lg shadow-sm"
             >
               <div>
-                <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0' }}>
+                <p className="text-lg font-bold mb-1">
                   {slip.target_month}分 給与明細
                 </p>
-                <p style={{ fontSize: '12px', color: '#666', margin: 0 }}>
+                <p className="text-xs text-gray-500">
                   発行日: {new Date(slip.created_at).toLocaleDateString()}
                 </p>
               </div>
               <button
                 onClick={() => handleViewPdf(slip.file_path)}
-                style={{
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  padding: '8px 16px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  marginTop: "16px"
-                }}
+                className="bg-[#0070f3] text-white py-2 px-4 rounded font-bold mt-4 hover:bg-blue-700 transition-colors"
               >
                 PDFを閲覧
               </button>
