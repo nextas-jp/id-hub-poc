@@ -41,7 +41,6 @@ export default function Login() {
 
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
     
-    // ▼▼▼ 修正：Supabaseのエラーメッセージを日本語に翻訳・カスタマイズ ▼▼▼
     if (authError) {
       let displayMessage = authError.message;
 
@@ -54,11 +53,13 @@ export default function Login() {
       setError(displayMessage);
       return;
     }
-    // ▲▲▲ 修正ここまで ▲▲▲
 
-    // MEMO: Go back to where we came from (the consent page), only inside this site
+    // ▼▼▼ ここから修正 ▼▼▼
     const next = typeof router.query.next === 'string' ? router.query.next : '/';
-    router.push(next.startsWith('/') && !next.startsWith('//') ? next : '/');
+    
+    // router.push(...) を削除し、強制的に画面を移動させてサーバー（ミドルウェア）にCookieを認識させる
+    window.location.href = next.startsWith('/') && !next.startsWith('//') ? next : '/';
+    // ▲▲▲ ここまで修正 ▲▲▲
   }
 
   return (
