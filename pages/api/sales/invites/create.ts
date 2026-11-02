@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes, createHash } from 'crypto';
+import { Adamina } from 'next/font/google';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,16 +21,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { workspaceId, email } = req.body;
   const token = randomBytes(32).toString('base64url');
-  const token_hash = createHash('sha256').update(token).digest('base64');
-  const expires_at = new Date(Date.now() + 48 * 3600 * 1000).toISOString(); //MEMO: 48 hours (check what will it be for real app) 
+  const tokenHash = createHash('sha256').update(token).digest('hex');
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString(); //MEMO: 48 hours (check what will it be for real app) 
   
   // add invitation inside DB
   const { error } = await supabaseAdmin.from('invites')
-    .insert({ workspace_id: workspaceId, email, token_hash, expires_at });
+    .insert({ workspace_id: workspaceId, email, token_hash: tokenHash, expires_at: expiresAt });
 
   if (error) return res.status(500).json({ error: error?.message ?? 'unknown system error' });
 
   return res.status(201).json({
-    url: `${process.env.HUB_URL}/invite?t=${token}`
+    inviteUrl: `${process.env.HUB_URL}/invite?t=${token}`
   });
 }

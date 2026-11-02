@@ -15,21 +15,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const token = req.body.t;
-  const token_hash = createHash('sha256').update(String(token)).digest('base64');
+  const token_hash = createHash('sha256').update(String(token)).digest('hex');
 
-  // only one request win
-  const { data: invite } = await supabaseAdmin.from('invites')
+  // ensure only one request can win (atomic opearation)
+  const { data: invite, error } = await supabaseAdmin.from('invites')
     .update({ used_at: new Date().toISOString() })
     .eq('token_hash', token_hash)
+    .is('used_at', null)
+    .gt('expires_at', new Date().toISOString())
     .select('email')
     .maybeSingle();
 
-  if (!invite) return res.status(410).json({ error: 'invalid request' });
+  if (!invite || error) return res.status(410).json({ error: error?.message ?? 'invalid or expired request' });
 
   const { data: link, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
     type: 'magiclink',
     email: invite.email,
-    // options: { redirectTo: `${process.env.HUB_URL}/welcome` }, // no need here because button action
+    // options: { redirectTo: `${process.env.HUB_URL}/welcome` }, //MEMO: no need here because button action
   });
 
   if (linkError){
