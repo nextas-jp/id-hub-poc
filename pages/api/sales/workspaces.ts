@@ -11,7 +11,7 @@ const supabaseAdmin = createClient(
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return res.status(405);
+    return res.status(405).end();
   }
 
   // TODO: Add protection layer to check logged-in sales staff and their role...
