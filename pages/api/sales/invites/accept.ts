@@ -15,6 +15,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const token = req.body.t;
+  console.log('here is the token:', token);
+  
   const token_hash = createHash('sha256').update(String(token)).digest('hex');
 
   // ensure only one request can win (atomic opearation)
@@ -39,6 +41,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(201).json({
-    tokenHash: link.properties.hashed_token 
+    tokenHash: link.properties.hashed_token
   });
 }
