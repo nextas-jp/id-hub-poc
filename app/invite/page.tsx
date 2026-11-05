@@ -25,7 +25,7 @@ function InviteInner() {
       return;
     }
   
-    const { tokenHash } = await response.json();
+    const { tokenHash, inviteId } = await response.json();
 
     console.log('tokenHash:', tokenHash);
     
@@ -40,7 +40,9 @@ function InviteInner() {
       return;
     }
 
-    router.push('/welcome')
+    // router.push('/welcome'); //MEMO: probalby  change to set a password page
+    // once logged in hub, for testing, we can redirect to tapin or other service with the param invite to do T_01_6...
+    window.location.href = `https://n-tapin-vercel-tau.vercel.app/auth/start?invite=${inviteId}`
   }
 
   return (
@@ -53,7 +55,7 @@ function InviteInner() {
         >Accept</button>
       </div>
     </main>
-  )
+  );
 }
 
 export default function Invite() {
