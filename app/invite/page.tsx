@@ -25,13 +25,13 @@ function InviteInner() {
       return;
     }
   
-    const { tokenHash, inviteId } = await response.json();
+    const { tokenHash, inviteId, type } = await response.json();
 
     console.log('tokenHash:', tokenHash);
     
     const { error } = await supabase.auth.verifyOtp({ 
       token_hash: tokenHash,
-      type: 'magiclink'
+      type: type
     });
 
     if (error) {
@@ -42,7 +42,8 @@ function InviteInner() {
 
     // router.push('/welcome'); //MEMO: probalby  change to set a password page
     // once logged in hub, for testing, we can redirect to tapin or other service with the param invite to do T_01_6...
-    window.location.href = `https://n-tapin-vercel-tau.vercel.app/auth/start?invite=${inviteId}`
+    // window.location.href = `https://n-tapin-vercel-tau.vercel.app/auth/start?invite=${inviteId}`;  <<<<<<<<<<<<<<<<<<<<<<<<<<
+    window.location.href = `http://localhost:3000/auth/start?invite=${inviteId}`
   }
 
   return (

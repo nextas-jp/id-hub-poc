@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes, createHash } from 'crypto';
-import { Adamina } from 'next/font/google';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
