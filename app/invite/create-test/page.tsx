@@ -37,7 +37,7 @@ export default function createTest() {
         <button
           onClick={submit}
           className="bg-[#0070f3] text-white py-2 px-4 rounded font-bold mt-4 hover:bg-blue-700 transition-colors"
-        >Accept</button>
+        >Generate Magic Link</button>
       </div>
       <p className='mt-2'>Invite created! Invite URL: <a href={inviteUrl} target='_blank'>{inviteUrl}</a></p>
     </main>
